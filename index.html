@@ -1,0 +1,242 @@
+<html data-dpr="1" style="font-size: 37.52px;">
+    <head>
+        <title>健康需求调查表</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta data-hid="description" name="description" content>
+        <meta name="wap-font-scale" content="no">
+        <link rel="stylesheet" href="css/question.css" />
+        <link rel="stylesheet" href="css/index.css" />
+        <!-- 引入 Vue 和 Vant 的 JS 文件 -->
+        <script src="js/vue.min.js"></script>
+        <script src="js/vant.min.js"></script>
+    </head>
+    <style>
+        [v-clock] {
+            display: none;
+        }
+    </style>
+    <body style="font-size: 24px;">
+        <div id="app" v-clock>
+            <div class="main_html" v-clock>
+                <div class="main-content" style="background:#fff;margin-top:0px;">
+                    <div class="header-content">
+                        <div class="content" v-clock>
+                            <div class="self_test_warp">
+                                <div class="self_test_title">
+                                    答题期间终端回答，数据将不被保存
+                                    本测评内容仅供参考，不作为诊断依据
+                                </div>
+                                <!-- 进度条 -->
+                                <div class="schedule_wrapbox">
+                                    <div class="schedule_wrap">
+                                        <!-- :style="{'width':(Qindex+1+'0'+'%')}" -->
+                                        <div class="cur_schedule" :style="{'width':(BFZ*(Qindex+1)+'%')}"></div>
+                                    </div>
+                                    <div class="Boxpress">
+                                        100%
+                                    </div>
+                                </div>
+                                <!-- end -->
+                                <!-- 进度 -->
+                                <div class="back_schedule_wrap" v-clock>
+                                    <span>{{Qindex+1}}</span>/{{quesList.length}}
+                                </div>
+                                <div class="oboxtext" v-clock>
+                                    已完成{{((Qindex+1)/4)*100 +'%'}}还剩{{quesList.length-(Qindex+1)}}道题
+                                </div>
+                           
+                        </div>
+                        <!--  -->
+                        <div class="steepbox"> </div>
+                        <div class="Qt-box">
+                          
+                                <!--  -->
+                                <!-- 当前进度/总进度end -->
+                                <div class="self_test_question" v-clock><span id="curQuestionTitle">{{Qindex+1}}.{{quesList[Qindex].title}}</span></div>
+                                <!-- type:1 选项题  2填空题 -->
+                                <ul class="self_test_main_wrap" v-if="quesList[Qindex].type==1">
+                                    <li score="0" class="self_test_item self_test_normal" v-for="(item,index) in quesList[Qindex].answerList"
+                                        @click="getRadio(index,index)" :class="[item.active?'self_test_select':'']">
+                                        <div class="self_test_icon choose_normal" :class="[item.active?'choose_select':'']"></div>
+                                        <div class="self_test_option" :style="{'color':(item.active?'#fff':'#333'),'border':(item.active?'1rpx solid #5D91F6':'1rpx solid #999')}">
+                                            {{item.name}}
+                                        </div>
+                                    </li>
+                                </ul>
+                                <!-- 2填空题 -->
+                                <div class="self_test_main_wrap" v-clock v-if="quesList[Qindex].type==2">
+                                    <!-- 文本框 -->
+                                    <div class="" v-clock>
+                                        <textarea v-clock class="inputBox" rows="5" cols="5">{{quesList[Qindex].content}}</textarea>
+                                    </div>
+                                    <!-- end -->
+                            
+                                </div>
+                                <!-- end -->
+                                <!-- 操作 -->
+                                <div class="self_test_back_wrap " v-clock>
+                                    <span id="backTxt" v-if="Qindex>0" :class="[Qindex>0?'':'display_none']" @click="getBack">上一题</span>
+                                    <span id="nextbtn" :class="[Qindex>0?'':'display_none']" @click="getnext" v-if="quesList[Qindex].type==2">下一题</span>
+                                    <span id="backTxt" @click="getsubmit" v-if="Qend==1">提交测试</span>
+                                </div>
+                        </div>
+                            <!-- end -->
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                new Vue({
+                    el: '#app',
+                    data: {
+                        // 当前索引
+                        Qindex: 0,
+                        // 百分比进度
+                        BFZ:0,
+                        // 提交测试按钮显示状态
+                        Qend: 0,
+                        // 标题
+                        title: "健康需求调查表",
+                        // 题型数据
+                        quesList: [{
+                                title: "您多长时间做一次健康体检？",
+                                type: 1, //1 选项题 2填空题
+                                answerList: [{
+                                    name: "从来不做"
+                                }, {
+                                    name: "半年"
+                                }, {
+                                    name: "1年"
+                                }, 
+                                {
+                                    name: "2-3年"
+                                }]
+                            },
+                            // {
+                            //     type: 2,
+                            //     title: "您是否有夜间睡眠打鼾及呼吸暂停的现象？",
+                            //     content: "jhhh"
+                            // }, 
+                            {
+                                type: 1,
+                                title: "您今年是否做过健康体检 ？",
+                                answerList: [{
+                                    name: "已做"
+                                }, {
+                                    name: "未做"
+                                }]
+                            },
+                            {
+                                type: 1,
+                                title: "您是否接种过以下疫苗 ？",
+                                answerList: [{
+                                    name: "四价流感疫苗"
+                                }, {
+                                    name: "23价肺炎疫苗"
+                                },
+                                {
+                                    name: "二价宫颈癌疫苗"
+                                },
+                                {
+                                    name: "四价宫颈癌疫苗"
+                                },
+                                {
+                                    name: "九价宫颈癌疫苗"
+                                }]
+                            },
+                            {
+                                type: 1,
+                                title: "您是否接受我们推送您健康宣教内容 ？",
+                                answerList: [{
+                                    name: "愿意"
+                                }, {
+                                    name: "不愿意"
+                                }]
+                            }
+
+                        ]
+
+                    },
+
+                    mounted() {
+                     var that=this;
+                     // 这里通过总题数计算百分比%
+                     that.BFZ=100/(that.quesList.length);
+                    },
+                    methods: {
+                        /**
+                         * 返回上一题
+                         *@param {Qindex}当前题目索引-1
+                         * **/
+                        getBack() {
+                            var that = this;
+                            if (that.Qindex > 0) {
+                                that.Qindex = that.Qindex - 1;
+                                that.Qend=0;
+                            }
+                            console.log("上一题长度", that.Qindex);
+                        },
+                        /**
+                         * 下一题
+                         * @param {Qindex}当前题目索引+1
+                         */
+                        getnext() {
+                            var that = this;
+                            that.Qindex = that.Qindex + 1;
+                            console.log("下一题长度", that.Qindex);
+                        },
+                        /**
+                         * 选中列表
+                         * @param {index} 当前选中选项 
+                         */
+                        getRadio(item, index) {
+                            var that = this;
+                            // 获取到选择答案数据
+                            var list = that.quesList[that.Qindex].answerList;
+                            // 获取总题数长度
+                            var Qlength = that.quesList.length;
+                            //循环数组数据，判断是否选中
+                            for (var i in list) {
+                                if (index == i) {
+                                    list[i].active = true;
+                                    if (that.Qindex < Qlength - 1) {
+                                        that.Qindex = that.Qindex + 1;
+                                    }
+                                    // 这里更新进度条
+                                    console.log("获取长度1", that.Qindex);
+                                    console.log("获取长度2", Qlength);
+
+                                } else {
+                                    list[i].active = false;
+                                }
+                            }
+                            if (that.Qindex == Qlength - 1) {
+                                console.log("~~~~这里到达最后一题~~~~~~");
+                                // 设置显示提交按钮
+                                that.Qend = 1;
+                            } else {
+                                // 关闭提交按钮
+                                that.Qend = 0;
+                            }
+                            // 避免页面渲染无效
+                            that.$forceUpdate();
+                        },
+                        /**提交数据**/
+                        getsubmit() {
+                            // 获取最终用户选中的数据
+                            var that = this;
+                            // that.quesList此数据是问题跟选项数组数据,选项中参数active为true，标识用户选中的数据
+                            console.log("用户最终选中的数据====>", that.quesList);
+                            that.$toast({
+                               message:JSON.stringify(that.quesList),
+                               forbidClick: true,
+                             });
+
+                        }
+
+                    }
+                })
+            </script>
+    </body>
+</html>
